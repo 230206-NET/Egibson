@@ -1,5 +1,15 @@
-﻿//Console.WriteLine("Hello World!");
-using System.Text;
+﻿namespace HangMan;
+
+    using System.Text;
+    public class MainMenu
+    {
+        public void Start()
+        {
+
+
+
+//Console.WriteLine("Hello World!");
+
 
 Random rnd = new Random();
 string[] words = new string[] { "file","horse","set","tango","left","juice","speak","world","dance","sting","double","return","csharp","parent","retail","dog","jumping","chew","hail","runtime","method","con","keyboard","flag","america","inbound","sale","clothing","object","syntax","gas","dirt","hold", "mango"};
@@ -112,3 +122,14 @@ int limbs = 6;
 
 
 */
+            
+        }
+
+
+    }
+
+
+
+
+
+

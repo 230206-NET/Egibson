@@ -44,7 +44,7 @@
             break;
             case"7": 
                 Console.WriteLine("Going to run TikTakToe");
-                new TikTak.MainMenu().Start();
+                new TikTak.OtherMenu().OtherStart();
             break;
             case "x":
                 Console.WriteLine("Goodbye!");

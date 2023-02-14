@@ -1,6 +1,16 @@
-﻿// See https://aka.ms/new-console-template for more information
-// this is a comment. 
-// double slash is a comment line. 
+﻿//Namespace is logical collection of types /classes/etc. 
+//Namespace can span multuple files and projects. 
+
+
+namespace FirstDotNet;
+
+public class MainMenu{
+
+	public void Start(){
+
+
+
+
 Console.WriteLine("Hello, World!");
 Console.WriteLine("What is the big deal my friends? This is simple for me to do on my own");
 
@@ -30,5 +40,9 @@ else
 
 
 Console.WriteLine("end of program");
+	}
 
- 
+
+}
+
+
