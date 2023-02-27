@@ -52,11 +52,13 @@ public static int UploadExpense(string connectionString, Expense ExpenseToUpload
         //Here we have a new command that we formulate.
         //parameterize our insert statment, @
         //Dont't ever conctenate or use string interpolation for sql command, as it is vulnerable to SQL Injection. 
-        using SqlCommand command = new SqlCommand("INSERT INTO Expenses (ExpenseAmmount, ExpenseNote, Approved, EmployeeID) OUTPUT INSERTED.ExpenseID VALUES (@ea, @en, @app, @empID);", connection);
+        using SqlCommand command = new SqlCommand("INSERT INTO Expenses (ExpenseAmmount, ExpenseName, ExpenseNote, Approved, EmployeeID) OUTPUT INSERTED.ExpenseID VALUES (@ea, @ename, @en, @app, @empID);", connection);
         command.Parameters.AddWithValue("@ea", ExpenseToUpload.Cost);
-        command.Parameters.AddWithValue("@en", ExpenseToUpload.ExpenseName);
+        command.Parameters.AddWithValue("@ename", ExpenseToUpload.ExpenseName);
+        command.Parameters.AddWithValue("@en", ExpenseToUpload.ExpenseDescription);
         command.Parameters.AddWithValue("@app", ExpenseToUpload.Approved);
         command.Parameters.AddWithValue("@empID", ExpenseToUpload.ExpenseEmpID);
+
         command.Connection.Open();
         //command.ExecuteNonQuery(); this will run the insert command without returning anything.
         int CreatedID = (int) command.ExecuteScalar(); //will return the id of the row. 
