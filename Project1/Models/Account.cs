@@ -1,4 +1,5 @@
 ﻿using System;
+using Serilog;
 namespace Models;
 
 /// <summary>
@@ -13,7 +14,7 @@ public class Account
     public string AccountName {get; set;} = "";
     public int EID {set; get;} 
   
-    public void getAccount()
+    public void setAccount()
     {   
         Console.WriteLine("Please enter your account Information.");
         Console.WriteLine("Please Enter Employee name: ");

@@ -1,6 +1,7 @@
 ﻿namespace Models;
 using Services;
 using System;
+using Serilog;
 
     /// <summary>
     /// This class holds the data for an expense. 
@@ -16,11 +17,6 @@ public class Expense
     public bool Approved {get; set;}
     public int ExpenseID{get; set;} = 0;
     public string ExpenseDate {get; set;} ="";
-
-//Can I replace these with something more efficent? 
-//These are here because I want to return expenses with the proper user information.
-//Should I use a dictionary instead and print off that? 
-//although it makes it easier to return and change expenses in manager doing it this way as well.
     public string ExpenseUser{get; set;} = "";
     public string ExpenseAccountName{get; set;} = "";
     public int ExpenseEmpID{set; get;}
@@ -32,14 +28,22 @@ public Expense(int empID)
 ExpenseEmpID = empID;
 Console.WriteLine("Please enter the Expense Name: ");
 ExpenseName = Console.ReadLine()!;
+//condition ? consequent : alternative
+if (ExpenseName == null) ExpenseName = DateTime.Today.ToString();
 Console.WriteLine("Please enter Expense Discription");
 ExpenseDescription = Console.ReadLine()!;
+if (ExpenseDescription == null) ExpenseDescription = DateTime.Today.ToString();
         while(true)
         {
         Console.WriteLine("Please Enter Expense Amount");
         bool success = Int32.TryParse( Console.ReadLine(), out int tempcost);
         if(success) {Cost = tempcost; break;}
-        else FailureOnInput.ExpectedInt();
+        else 
+        {
+            Log.Warning("Models: Expense, Cost not an int.");
+            FailureOnInput.ExpectedInt();
+        
+        }
         }
         
 
@@ -49,7 +53,7 @@ ExpenseDescription = Console.ReadLine()!;
 
             public override string ToString()
             {   
-                if (this.ExpenseID == 0) return $"Name of Expense: {this.ExpenseName} Approval Sataus: {this.Approved} Cost: {this.Cost} \n  Expense Notes: {this.ExpenseDescription}\n  Expense Date {this.ExpenseDate}\n_________________";
+                if (this.ExpenseID == 0) return $"Name of Expense: {this.ExpenseName} Approval Sataus: {this.Approved} \n Cost: {this.Cost} \n  Expense Notes: {this.ExpenseDescription}\n  Expense Date {this.ExpenseDate}\n_________________";
                  return $"Expense ID {this.ExpenseID} Approval Sataus: {this.Approved}\n  Name of Expense: {this.ExpenseName} Cost: {this.Cost} \n  Employee Name:{this.ExpenseAccountName}\n  Expense Notes: {this.ExpenseDescription}\n  Expense Date {this.ExpenseDate}\n_________________";
             }
 

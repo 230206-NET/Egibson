@@ -1,8 +1,7 @@
 ﻿namespace project;
-//using Serilog;
 using DataAccess;
 using Models;
-using Tests;
+using Serilog;
 
 
 
@@ -10,7 +9,13 @@ public class MainMenu{
 
     static void Main(string[] args)
     {
+    Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("../logs/logs.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
 
+
+        Console.WriteLine("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
         Console.WriteLine("Hello and Welcome to the login screen");
         Console.WriteLine("1. Make a new account");
         Console.WriteLine("2. Login to your account.");
@@ -27,7 +32,7 @@ switch (Selection)
 
         Console.WriteLine("Starting New Account");
         Account newAccount = new Account();
-        newAccount.getAccount();
+        newAccount.setAccount();
         int returnID = DBConnector.UploadUser(newAccount, Secrets.getConnectionString());
         newAccount.EID = returnID;
           //if this returnedID is 0 then there was a problem and we will start agian.
@@ -112,7 +117,39 @@ while(stayloggedin)
             Console.WriteLine(e);
           }
           break;
-          case "3":
+          case "3": 
+            int aInput =0;
+            while(true)
+              {
+                  Console.WriteLine("Welcome to Expense Approval");
+                  Console.WriteLine("You may enter anything other than a number to exit approval.");
+                  Console.WriteLine("1. Get Unapproved Expenses");
+                  Console.WriteLine("2. Make an Approval");
+                  bool aValid = Int32.TryParse(Console.ReadLine(), out aInput);
+                  if (aValid == false) break;
+                  if (aInput != 1 && aInput != 2) continue; 
+                      if (aInput == 1) 
+                      {
+                        List<Expense> approvalExpensesToPrint = new List<Expense>();
+                        approvalExpensesToPrint = DBConnector.GetAllExpensesNotApproved(Secrets.getConnectionString());
+                        foreach(Expense e in approvalExpensesToPrint)
+                                {
+                                  Console.WriteLine(e);
+                                }
+
+                      }//end option 1.
+                      if(aInput == 2)
+                        {
+                              Console.WriteLine("Please enter an expense ID to approve or anything other than a number to exit.");
+                              bool bValid = Int32.TryParse(Console.ReadLine(), out int eID);
+                              if (bValid == false) break;
+                              int returnedexpID = DBConnector.ApproveExpense(Secrets.getConnectionString(), eID);
+                              if(returnedexpID == 0) Console.WriteLine("That did not work! Is the ID wrong?");
+                              else Console.WriteLine(" Expense with ID: " + returnedexpID + " Was removed");
+
+                        }
+                      
+              }
           break;
           case "4":  stayloggedin = false;
           break;

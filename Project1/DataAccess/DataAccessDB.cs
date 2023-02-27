@@ -189,6 +189,57 @@ private static void DisplaySqlErrors(SqlException exception)
      
      }
 
+ public static List<Expense> GetAllExpensesNotApproved(string connectionString)
+    {   List<Expense> expenses = new();
+            
+            try
+            {
+
+            using (SqlConnection connection = new SqlConnection(
+               connectionString))
+               {
+
+                
+                using SqlCommand command = new SqlCommand("Select ExpenseID, AccountName, UserName,CONVERT(varchar(10), [CreationDate], 20) as CreationDatestring, ExpenseAmmount, ExpenseNote, Approved from users right join expenses on users.EmployeeID = expenses.EmployeeID where Expenses.Approved = 0;", connection);
+                command.Connection.Open();
+                using SqlDataReader reader = command.ExecuteReader();
+            if(reader.HasRows)
+            { 
+                while(reader.Read()) 
+                {
+                    int eid = (int) reader["ExpenseID"];
+                    string an = (string) reader["AccountName"];
+                    string  un = (string) reader ["UserName"];
+                    string u = (string) reader["CreationDatestring"];
+                    int ea = (int) reader["ExpenseAmmount"];
+                    string en = (string) reader["ExpenseNote"];
+                    bool ad = (bool) reader["Approved"];
+
+                    Expense expense = new Expense(){
+                        ExpenseID = eid,
+                        ExpenseAccountName = an,
+                        ExpenseUser = un,
+                        ExpenseDate = u,
+                        Cost = ea,
+                        ExpenseDescription = en,
+                        Approved = ad,
+                    };
+                    expenses.Add(expense);
+
+               }
+            }
+
+            }
+            
+     }
+     catch(Exception ex)
+        {
+            throw;
+        }
+     return expenses;
+     
+     }
+
      public static List<Expense> GetMyExpenses(string connectionString, int empID)
     {   List<Expense> expenses = new();
             
@@ -238,6 +289,32 @@ private static void DisplaySqlErrors(SqlException exception)
      
      }
 
+public static int ApproveExpense(string connectionString, int eID)
+{
+    Int32 appExpID = 0;
+    string sql = "Update expenses set Approved = 1 where ExpenseID = @eID;";
+    using (SqlConnection conn = new SqlConnection(connectionString))
+    {
+        SqlCommand cmd = new SqlCommand(sql, conn);
+        cmd.Parameters.AddWithValue("@eID", eID);
+
+        try
+        {
+            conn.Open();
+            cmd.ExecuteNonQuery();
+            appExpID = eID;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+    return appExpID;
+
+
+
+
+}
 public static bool isManager(string connectionString, string username, string password)
 {
     
