@@ -20,10 +20,10 @@ builder.Services.AddScoped<Expense>();
 
 
 var app = builder.Build();
-app.UseHttpsRedirection();
+
 app.UseSwagger();
 app.UseSwaggerUI();
-
+app.UseHttpsRedirection();
 //GetAllExpenses
 app.MapGet("/expenses", ( [FromServices] DBConnector conn) => {
 

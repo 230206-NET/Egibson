@@ -23,6 +23,8 @@ public class Expense
 
 //end of copy of user information.
 public Expense(){  }
+
+public Expense expensewithEMPID(int passedIn){return new Expense(passedIn);}
 public Expense(int empID)
 {
 ExpenseEmpID = empID;

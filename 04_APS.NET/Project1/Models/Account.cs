@@ -22,17 +22,15 @@ public class Account
 
         Console.WriteLine("Please Enter Employee name: ");
         this.AccountName = Console.ReadLine();
-        Thread.Sleep(100);
         Console.WriteLine("What will your username be? :");
-        this.UserName = Console.ReadLine()!;
-        Thread.Sleep(100);
+        this.UserName = Console.ReadLine();
         Console.WriteLine("What will your password be? :");
-        string pass = passWordClass.passwordInput();
+       // string pass = passWordClass.passwordInput();
+        string pass = Console.ReadLine();
         this.Password = pass;
-        Thread.Sleep(10);
         Console.WriteLine("Are you a Manager? [y/n]");
-        string tempString = Console.ReadLine()!;
-        if("t" == tempString.ToLower() || "y" == tempString.ToLower()) this.isManager = true; 
+        string tempString = Console.ReadLine();
+        if("t" == tempString || "y" == tempString) this.isManager = true; 
         
     }
 
