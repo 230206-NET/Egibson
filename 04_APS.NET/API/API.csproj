@@ -12,9 +12,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Project1\Models\Models.csproj" />
-    <ProjectReference Include="..\..\Project1\DataAccess\DataAccess.csproj" />
-    <ProjectReference Include="..\..\Project1\Services\Services.csproj" />
+    <ProjectReference Include="..\Project1\Models\Models.csproj" />
+    <ProjectReference Include="..\Project1\DataAccess\DataAccess.csproj" />
+    <ProjectReference Include="..\Project1\Services\Services.csproj" />
   </ItemGroup>
 
 </Project>

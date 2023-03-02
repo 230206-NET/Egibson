@@ -22,7 +22,7 @@ public class Expense
     public int ExpenseEmpID{set; get;}
 
 //end of copy of user information.
-public Expense(){}
+public Expense(){  }
 public Expense(int empID)
 {
 ExpenseEmpID = empID;

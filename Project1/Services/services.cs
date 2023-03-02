@@ -1,6 +1,8 @@
 ﻿namespace Services;
 using System;
 using Serilog;
+// using Models;
+// using DataAccess;
 
 
 public static class FailureOnInput
@@ -71,6 +73,7 @@ public static int checkINT()
 
 }
 
+
 public static class passWordClass{
 
 public static string passwordInput(){
@@ -98,4 +101,14 @@ var pass = string.Empty;
 
 
 
+
 }
+
+// public static class dataServices{
+
+// public static int CreateNewUser(Account newAccount)
+// {   
+//     return DBConnector.UploadUser(newAccount, Secrets.getConnectionString());
+// }
+//}
+

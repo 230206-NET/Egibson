@@ -7,13 +7,21 @@ using Serilog;
 
 public class DBConnector {
 
-public static int UploadUser(Account AccountToCreate, string connectionString)
+// public DBConnector dbconn = new DBConnector();
+
+private readonly string _connectionString;
+public DBConnector(string connectionString)
+{
+    _connectionString = connectionString;
+
+}
+public static int UploadUser(Account AccountToCreate, string _connectionString)
 {   
         try
         {
     //This next statement sets up the db connection.
     using (SqlConnection connection = new SqlConnection(
-               connectionString))
+               _connectionString))
     {
 
         //Here we have a new command that we formulate.
@@ -41,13 +49,13 @@ public static int UploadUser(Account AccountToCreate, string connectionString)
 }
 
 
-public static int UploadExpense(string connectionString, Expense ExpenseToUpload)
+public static int UploadExpense(string _connectionString, Expense ExpenseToUpload)
 {   
         try
         {
     //This next statement sets up the db connection.
     using (SqlConnection connection = new SqlConnection(
-               connectionString))
+               _connectionString))
     {
 
         //Here we have a new command that we formulate.
@@ -93,7 +101,7 @@ private static void DisplaySqlErrors(SqlException exception)
 }
 
 
- public static List<Account> GetAllAccounts(string connectionString)
+ public static List<Account> GetAllAccounts(string _connectionString)
     {   List<Account> Accounts = new();
 
             Console.WriteLine("Attemping to fetch user accounts");
@@ -102,7 +110,7 @@ private static void DisplaySqlErrors(SqlException exception)
             {
 
             using (SqlConnection connection = new SqlConnection(
-               connectionString))
+               _connectionString))
                {
 
                 
@@ -141,18 +149,18 @@ private static void DisplaySqlErrors(SqlException exception)
      
      }
 
-     public static List<Expense> GetAllExpenses(string connectionString)
+     public static List<Expense> GetAllExpenses(string _connectionString)
     {   List<Expense> expenses = new();
             
             try
             {
 
             using (SqlConnection connection = new SqlConnection(
-               connectionString))
+               _connectionString))
                {
 
                 
-                using SqlCommand command = new SqlCommand("Select ExpenseID, AccountName, UserName,CONVERT(varchar(10), [CreationDate], 20) as CreationDatestring, ExpenseAmmount, ExpenseNote, Approved from users right join expenses on users.EmployeeID = expenses.EmployeeID;", connection);
+                using SqlCommand command = new SqlCommand("Select ExpenseID, AccountName, UserName, ExpenseDate, ExpenseAmmount, ExpenseNote, Approved from users right join expenses on users.EmployeeID = expenses.EmployeeID;", connection);
                 command.Connection.Open();
                 using SqlDataReader reader = command.ExecuteReader();
             if(reader.HasRows)
@@ -162,7 +170,7 @@ private static void DisplaySqlErrors(SqlException exception)
                     int eid = (int) reader["ExpenseID"];
                     string an = (string) reader["AccountName"];
                     string  un = (string) reader ["UserName"];
-                    string u = (string) reader["CreationDatestring"];
+                    string u = (string) reader["ExpenseDate"];
                     int ea = (int) reader["ExpenseAmmount"];
                     string en = (string) reader["ExpenseNote"];
                     bool ad = (bool) reader["Approved"];
@@ -192,14 +200,14 @@ private static void DisplaySqlErrors(SqlException exception)
      
      }
 
- public static List<Expense> GetAllExpensesNotApproved(string connectionString)
+ public static List<Expense> GetAllExpensesNotApproved(string _connectionString)
     {   List<Expense> expenses = new();
             
             try
             {
 
             using (SqlConnection connection = new SqlConnection(
-               connectionString))
+               _connectionString))
                {
 
                 
@@ -243,14 +251,14 @@ private static void DisplaySqlErrors(SqlException exception)
      
      }
 
-     public static List<Expense> GetMyExpenses(string connectionString, int empID)
+     public static List<Expense> GetMyExpenses(string _connectionString, int empID)
     {   List<Expense> expenses = new();
             
             try
             {
 
             using (SqlConnection connection = new SqlConnection(
-               connectionString))
+               _connectionString))
                {
 
                 
@@ -265,6 +273,7 @@ private static void DisplaySqlErrors(SqlException exception)
                 {
                     string ename = (string) reader["ExpenseName"];
                     string u = (string) reader["CreationDatestring"];
+                    string dt = (string) reader["ExpenseDate"];
                     int ea = (int) reader["ExpenseAmmount"];
                     string en = (string) reader["ExpenseNote"];
                     bool ad = (bool) reader["Approved"];
@@ -292,11 +301,62 @@ private static void DisplaySqlErrors(SqlException exception)
      
      }
 
-public static int ApproveExpense(string connectionString, int eID)
+
+public static List<Expense> GetDeleted(string _connectionString)
+    {   List<Expense> expenses = new();
+            
+            try
+            {
+
+            using (SqlConnection connection = new SqlConnection(
+               _connectionString))
+               {
+
+                
+                using SqlCommand command = new SqlCommand("get_removed", connection);
+                command.Connection.Open();
+                command.CommandType = CommandType.StoredProcedure;
+                using SqlDataReader reader = command.ExecuteReader();
+
+            if(reader.HasRows)
+            { 
+                while(reader.Read()) 
+                {
+                    string ename = (string) reader["ExpenseName"];
+                    int ExpenseID = (int) reader["ExpenseID"];
+                    int ea = (int) reader["ExpenseAmmount"];
+                    string en = (string) reader["ExpenseNote"];
+                    string dt = (string) reader["ExpDate"];
+                    int empoyID = (int) reader["EmpID"];
+
+                    Expense expense = new Expense(){
+                        ExpenseName = ename,
+                        Cost = ea,
+                        ExpenseDescription = en,
+                        ExpenseEmpID = empoyID,
+                        ExpenseDate = dt,
+                    };
+                    expenses.Add(expense);
+
+               }
+            }
+
+            }
+            
+     }
+     catch(Exception ex)
+        {
+            throw;
+        }
+     return expenses;
+     
+     }
+
+public static int ApproveExpense(string _connectionString, int eID)
 {
     Int32 appExpID = 0;
     string sql = "Update expenses set Approved = 1 where ExpenseID = @eID;";
-    using (SqlConnection conn = new SqlConnection(connectionString))
+    using (SqlConnection conn = new SqlConnection(_connectionString))
     {
         SqlCommand cmd = new SqlCommand(sql, conn);
         cmd.Parameters.AddWithValue("@eID", eID);
@@ -313,16 +373,32 @@ public static int ApproveExpense(string connectionString, int eID)
         }
     }
     return appExpID;
-
-
-
-
 }
-public static void PromoteDemoteUser(string connectionString, int eID,bool selection)
+public static void removeExpense(string _connectionString, int expID)
+{
+    string sql = "remove_expense";
+    using (SqlConnection conn = new SqlConnection(_connectionString))
+    {
+        SqlCommand cmd = new SqlCommand(sql, conn);
+        cmd.CommandType = CommandType.StoredProcedure;
+        cmd.Parameters.AddWithValue("@expID", expID);
+
+        try
+        {
+            conn.Open();
+            cmd.ExecuteNonQuery();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+}
+public static void PromoteDemoteUser(string _connectionString, int eID,bool selection)
 {
 
     string sql = "Update Users set IsManager = @status where EmployeeID = @eID;";
-    using (SqlConnection conn = new SqlConnection(connectionString))
+    using (SqlConnection conn = new SqlConnection(_connectionString))
     {
         SqlCommand cmd = new SqlCommand(sql, conn);
         cmd.Parameters.AddWithValue("@eID", eID);
@@ -344,12 +420,12 @@ public static void PromoteDemoteUser(string connectionString, int eID,bool selec
 
 
 }
-public static bool isManager(string connectionString, string username, string password)
+public static bool isManager(string _connectionString, string username, string password)
 {
     
     bool isMan = false;
     string sql = "Select isManager From [Users] where UserName = @a and [Password] = @b ;";
-    using (SqlConnection conn = new SqlConnection(connectionString))
+    using (SqlConnection conn = new SqlConnection(_connectionString))
     {
         SqlCommand cmd = new SqlCommand(sql, conn);
         cmd.Parameters.AddWithValue("@a", username);
@@ -370,11 +446,11 @@ public static bool isManager(string connectionString, string username, string pa
 
 }
      
-static public int Isthisauser(string connectionString, string username, string password)
+static public int Isthisauser(string _connectionString, string username, string password)
 {
-    Int32 newProdID = 0;
+    Int32 userID = 0;
     string sql = "Select EmployeeID From [Users] where UserName = @a and [Password] = @b ;";
-    using (SqlConnection conn = new SqlConnection(connectionString))
+    using (SqlConnection conn = new SqlConnection(_connectionString))
     {
         SqlCommand cmd = new SqlCommand(sql, conn);
         cmd.Parameters.AddWithValue("@a", username);
@@ -382,14 +458,14 @@ static public int Isthisauser(string connectionString, string username, string p
         try
         {
             conn.Open();
-            newProdID = (Int32)cmd.ExecuteScalar();
+            userID = (Int32)cmd.ExecuteScalar();
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
         }
     }
-    return (int)newProdID;
+    return (int)userID;
 }
 
 
@@ -402,4 +478,4 @@ static public int Isthisauser(string connectionString, string username, string p
 }
 
 
- //public static List<Account> GetAllExpenses(string connectionString)
+ //public static List<Account> GetAllExpenses(string _connectionString)

@@ -5,6 +5,7 @@
 **/Secrets.cs
 # Marks files
 MarksLessonsLearned.txt
+**/appsettings.Development.json
 #ReimbursementApi/
 
 # User-specific files
