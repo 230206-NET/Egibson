@@ -21,15 +21,15 @@ public class Account
     {   
 
         Console.WriteLine("Please Enter Employee name: ");
-        this.AccountName = Console.ReadLine();
+        this.AccountName = Console.ReadLine()!;
         Console.WriteLine("What will your username be? :");
-        this.UserName = Console.ReadLine();
+        this.UserName = Console.ReadLine()!;
         Console.WriteLine("What will your password be? :");
        // string pass = passWordClass.passwordInput();
-        string pass = Console.ReadLine();
+        string pass = Console.ReadLine()!;
         this.Password = pass;
         Console.WriteLine("Are you a Manager? [y/n]");
-        string tempString = Console.ReadLine();
+        string tempString = Console.ReadLine()!;
         if("t" == tempString || "y" == tempString) this.isManager = true; 
         
     }

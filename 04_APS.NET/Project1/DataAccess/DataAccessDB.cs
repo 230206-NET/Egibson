@@ -61,12 +61,13 @@ public static int UploadExpense(string _connectionString, Expense ExpenseToUploa
         //Here we have a new command that we formulate.
         //parameterize our insert statment, @
         //Dont't ever conctenate or use string interpolation for sql command, as it is vulnerable to SQL Injection. 
-        using SqlCommand command = new SqlCommand("INSERT INTO Expenses (ExpenseAmmount, ExpenseName, ExpenseNote, Approved, EmployeeID) OUTPUT INSERTED.ExpenseID VALUES (@ea, @ename, @en, @app, @empID);", connection);
+        using SqlCommand command = new SqlCommand("INSERT INTO Expenses (ExpenseAmmount, ExpenseName, ExpenseNote, EmployeeID, ExpenseDate) OUTPUT INSERTED.ExpenseID VALUES (@ea, @ename, @en, @empID, @eDate);", connection);
         command.Parameters.AddWithValue("@ea", ExpenseToUpload.Cost);
         command.Parameters.AddWithValue("@ename", ExpenseToUpload.ExpenseName);
         command.Parameters.AddWithValue("@en", ExpenseToUpload.ExpenseDescription);
-        command.Parameters.AddWithValue("@app", ExpenseToUpload.Approved);
         command.Parameters.AddWithValue("@empID", ExpenseToUpload.ExpenseEmpID);
+        string dateString = DateTime.Now.ToString();
+        command.Parameters.AddWithValue("@EDate", dateString);
 
         command.Connection.Open();
         //command.ExecuteNonQuery(); this will run the insert command without returning anything.
@@ -160,7 +161,11 @@ private static void DisplaySqlErrors(SqlException exception)
                {
 
                 
-                using SqlCommand command = new SqlCommand("Select ExpenseID, AccountName, UserName, ExpenseDate, ExpenseAmmount, ExpenseNote, Approved from users right join expenses on users.EmployeeID = expenses.EmployeeID;", connection);
+                //using SqlCommand command = new SqlCommand("Select ExpenseID, ExpenseName, AccountName, UserName, ExpenseDate, ExpenseAmmount, ExpenseNote, Approved from users right join expenses on users.EmployeeID = expenses.EmployeeID;", connection);
+                using SqlCommand command = new SqlCommand("Select ExpenseID, ExpenseName, AccountName, UserName, ExpenseDate, ExpenseAmmount, ExpenseNote, users.EmployeeID, Approved from users right join expenses on users.EmployeeID = expenses.EmployeeID;", connection);
+
+                //Select ExpenseID, ExpenseName, AccountName, UserName, ExpenseDate, ExpenseAmmount, ExpenseNote, users.EmployeeID, Approved from users right join expenses on users.EmployeeID = expenses.EmployeeID;
+
                 command.Connection.Open();
                 using SqlDataReader reader = command.ExecuteReader();
             if(reader.HasRows)
@@ -168,21 +173,83 @@ private static void DisplaySqlErrors(SqlException exception)
                 while(reader.Read()) 
                 {
                     int eid = (int) reader["ExpenseID"];
+                    string expName = (string) reader["ExpenseName"];
                     string an = (string) reader["AccountName"];
                     string  un = (string) reader ["UserName"];
                     string u = (string) reader["ExpenseDate"];
                     int ea = (int) reader["ExpenseAmmount"];
                     string en = (string) reader["ExpenseNote"];
+                    int eeID = (int) reader["EmployeeID"];
                     bool ad = (bool) reader["Approved"];
 
                     Expense expense = new Expense(){
                         ExpenseID = eid,
+                        ExpenseName = expName,
                         ExpenseAccountName = an,
                         ExpenseUser = un,
                         ExpenseDate = u,
                         Cost = ea,
                         ExpenseDescription = en,
                         Approved = ad,
+                        ExpenseEmpID = eeID,
+                    };
+                    expenses.Add(expense);
+
+               }
+            }
+
+            }
+            
+     }
+     catch(Exception ex)
+        {
+            throw;
+        }
+     return expenses;
+     
+     }
+      public static List<Expense> ExpensesPending(string _connectionString)
+    {   List<Expense> expenses = new();
+            
+            try
+            {
+
+            using (SqlConnection connection = new SqlConnection(
+               _connectionString))
+               {
+
+                
+                //using SqlCommand command = new SqlCommand("Select ExpenseID, ExpenseName, AccountName, UserName, ExpenseDate, ExpenseAmmount, ExpenseNote, Approved from users right join expenses on users.EmployeeID = expenses.EmployeeID;", connection);
+                using SqlCommand command = new SqlCommand("Select ExpenseID, ExpenseName, AccountName, UserName, ExpenseDate, ExpenseAmmount, ExpenseNote, users.EmployeeID, Approved from users right join expenses on users.EmployeeID = expenses.EmployeeID where approved = 0;", connection);
+
+                //Select ExpenseID, ExpenseName, AccountName, UserName, ExpenseDate, ExpenseAmmount, ExpenseNote, users.EmployeeID, Approved from users right join expenses on users.EmployeeID = expenses.EmployeeID;
+
+                command.Connection.Open();
+                using SqlDataReader reader = command.ExecuteReader();
+            if(reader.HasRows)
+            { 
+                while(reader.Read()) 
+                {
+                    int eid = (int) reader["ExpenseID"];
+                    string expName = (string) reader["ExpenseName"];
+                    string an = (string) reader["AccountName"];
+                    string  un = (string) reader ["UserName"];
+                    string u = (string) reader["ExpenseDate"];
+                    int ea = (int) reader["ExpenseAmmount"];
+                    string en = (string) reader["ExpenseNote"];
+                    int eeID = (int) reader["EmployeeID"];
+                    bool ad = (bool) reader["Approved"];
+
+                    Expense expense = new Expense(){
+                        ExpenseID = eid,
+                        ExpenseName = expName,
+                        ExpenseAccountName = an,
+                        ExpenseUser = un,
+                        ExpenseDate = u,
+                        Cost = ea,
+                        ExpenseDescription = en,
+                        Approved = ad,
+                        ExpenseEmpID = eeID,
                     };
                     expenses.Add(expense);
 
@@ -211,29 +278,27 @@ private static void DisplaySqlErrors(SqlException exception)
                {
 
                 
-                using SqlCommand command = new SqlCommand("Select ExpenseID, AccountName, UserName,CONVERT(varchar(10), [CreationDate], 20) as CreationDatestring, ExpenseAmmount, ExpenseNote, Approved from users right join expenses on users.EmployeeID = expenses.EmployeeID where Expenses.Approved = 0;", connection);
+                using SqlCommand command = new SqlCommand("Select * from deletedexpenses where approved = 0", connection);
                 command.Connection.Open();
                 using SqlDataReader reader = command.ExecuteReader();
             if(reader.HasRows)
             { 
                 while(reader.Read()) 
                 {
-                    int eid = (int) reader["ExpenseID"];
-                    string an = (string) reader["AccountName"];
-                    string  un = (string) reader ["UserName"];
-                    string u = (string) reader["CreationDatestring"];
-                    int ea = (int) reader["ExpenseAmmount"];
-                    string en = (string) reader["ExpenseNote"];
-                    bool ad = (bool) reader["Approved"];
+                    int eid1 = (int) reader["EmpID"];
+                    string uedate1 = (string) reader["ExpDate"];
+                    int ea1 = (int) reader["ExpenseAmmount"];
+                    string en1 = (string) reader["ExpenseNote"];
+                    bool ad1 = (bool) reader["Approved"];
+                    string expensenames1 = (string) reader["ExpenseName"];
 
                     Expense expense = new Expense(){
-                        ExpenseID = eid,
-                        ExpenseAccountName = an,
-                        ExpenseUser = un,
-                        ExpenseDate = u,
-                        Cost = ea,
-                        ExpenseDescription = en,
-                        Approved = ad,
+                        ExpenseID = eid1,
+                        ExpenseDate = uedate1,
+                        Cost = ea1,
+                        ExpenseDescription = en1,
+                        Approved = ad1,
+                        ExpenseName = expensenames1,
                     };
                     expenses.Add(expense);
 
@@ -262,7 +327,7 @@ private static void DisplaySqlErrors(SqlException exception)
                {
 
                 
-                using SqlCommand command = new SqlCommand("Select ExpenseName, CONVERT(varchar(10), [CreationDate], 20) as CreationDatestring, ExpenseAmmount, ExpenseNote, Approved from users right join expenses on users.EmployeeID = expenses.EmployeeID where expenses.EmployeeID = @myID;", connection);
+                using SqlCommand command = new SqlCommand("Select ExpenseName, ExpenseID, ExpenseDate, ExpenseAmmount, ExpenseNote, users.EmployeeID, Approved from users right join expenses on users.EmployeeID = expenses.EmployeeID where expenses.EmployeeID = @myID;", connection);
                 command.Parameters.AddWithValue("@myID", empID);
                 command.Connection.Open();
                 using SqlDataReader reader = command.ExecuteReader();
@@ -272,18 +337,21 @@ private static void DisplaySqlErrors(SqlException exception)
                 while(reader.Read()) 
                 {
                     string ename = (string) reader["ExpenseName"];
-                    string u = (string) reader["CreationDatestring"];
                     string dt = (string) reader["ExpenseDate"];
                     int ea = (int) reader["ExpenseAmmount"];
                     string en = (string) reader["ExpenseNote"];
+                    int emplID = (int) reader["EmployeeID"];
+                    int emxlID = (int) reader["ExpenseID"];
                     bool ad = (bool) reader["Approved"];
 
                     Expense expense = new Expense(){
                         ExpenseName = ename,
-                        ExpenseDate = u,
+                        ExpenseDate = dt,
                         Cost = ea,
                         ExpenseDescription = en,
                         Approved = ad,
+                        ExpenseEmpID = emplID,
+                        ExpenseID = emplID,
                     };
                     expenses.Add(expense);
 
@@ -328,6 +396,7 @@ public static List<Expense> GetDeleted(string _connectionString)
                     string en = (string) reader["ExpenseNote"];
                     string dt = (string) reader["ExpDate"];
                     int empoyID = (int) reader["EmpID"];
+                    bool approvval = (bool) reader["Approved"];
 
                     Expense expense = new Expense(){
                         ExpenseName = ename,
@@ -335,6 +404,7 @@ public static List<Expense> GetDeleted(string _connectionString)
                         ExpenseDescription = en,
                         ExpenseEmpID = empoyID,
                         ExpenseDate = dt,
+                        Approved = approvval,
                     };
                     expenses.Add(expense);
 

@@ -5,6 +5,7 @@ using Serilog;
 
 
 
+
 public class MainMenu{
 
     static void Main(string[] args)
@@ -14,12 +15,14 @@ public class MainMenu{
     .WriteTo.File("../logs/logs.txt", rollingInterval: RollingInterval.Day)
     .CreateLogger();
 
+while(true){
 
         Console.WriteLine("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
         Console.WriteLine("Hello and Welcome to the login screen");
         Console.WriteLine("1. Make a new account");
         Console.WriteLine("2. Login to your account.");
-       // Console.WriteLine("4. ");
+        Console.WriteLine("x. Exit Application.");
+       
         
     string Selection;
    Selection = Console.ReadLine()!;
@@ -74,17 +77,11 @@ switch (Selection)
 
     }
     break;
-  case "3": 
-      Console.WriteLine("getting all acount");
-      List<Account> Accounts = DBConnector.GetAllAccounts(Secrets.getConnectionString());
-      foreach(Account Account in Accounts)
-      {
-        Console.WriteLine(Account);
-      }
-      break;
-  case "x":
+  case "x": System.Environment.Exit(1);
     break;
 }
+    
+    }
     }
 
 public static void PostLoginManager(int emplyeeID)

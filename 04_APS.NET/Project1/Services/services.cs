@@ -12,7 +12,6 @@ public static class FailureOnInput
         Console.Beep(); 
         Console.Beep(); 
         Console.Beep(); 
-        Console.ReadKey();
         }
     public static void ExpectedString(){
         Console.WriteLine("That was a empty!");
@@ -27,7 +26,7 @@ public static class FailureOnInput
         Console.Beep(); 
         Console.Beep(); 
         Console.WriteLine("Error, press any key to coninute");
-        Console.ReadKey();
+        Console.ReadLine();
     }
 public static void inputWasBad(){
         Console.Beep(); 

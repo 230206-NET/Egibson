@@ -16,7 +16,7 @@ public class Expense
     public double Cost {set; get;}
     public bool Approved {get; set;}
     public int ExpenseID{get; set;} = 0;
-    public string ExpenseDate {get; set;} ="";
+    public string ExpenseDate {get; set;}
     public string ExpenseUser{get; set;} = "";
     public string ExpenseAccountName{get; set;} = "";
     public int ExpenseEmpID{set; get;}
