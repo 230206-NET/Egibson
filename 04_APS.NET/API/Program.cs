@@ -6,11 +6,6 @@ using Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// AddSingleton => The same instance is shared across the entire app over the lifetime of the application
-// AddScoped => The instance is created every new request
-// AddTransient => The instance is created every single time it is required as a dependency 
-// builder.Services.AddScoped<IRepository, DBRepository>();
-// builder.Services.AddScoped<WorkoutService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
